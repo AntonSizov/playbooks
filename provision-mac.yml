@@ -25,3 +25,11 @@
       # check with: echo $BASH && echo $BASH_VERSION
     - name: Change the shell for the user (in any case)
       shell: chsh -s {{bash4path}} sizovanton
+
+    - name: Install virtualenv
+      pip:
+        executable: pip2.7
+        name: virtualenv
+        state: present
+      become: yes
+      become_method: sudo
