@@ -1,0 +1,27 @@
+# ansible-playbook --ask-become-pass -i "localhost," -c local ./provision-mac.yml
+- name: Provision OSX
+  hosts: all
+  vars:
+      bash4path: /usr/local/bin/bash
+      shell_register_path: /private/etc/shells
+      name_suffix: -full
+  tasks:
+    - name: Install bash 4
+      homebrew:
+        name: bash
+        state: present
+
+    - name: Check whether bash 4 was registered or not
+      shell:  grep {{bash4path}}  {{shell_register_path}} || true
+      register: is_bash_4_registered
+      changed_when: false
+
+    - name: Register bash 4
+      shell: echo {{bash4path}} >> {{shell_register_path}}
+      become: yes
+      become_method: sudo
+      when: (is_bash_4_registered.stdout == "")
+
+      # check with: echo $BASH && echo $BASH_VERSION
+    - name: Change the shell for the user (in any case)
+      shell: chsh -s {{bash4path}} sizovanton
